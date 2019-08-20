@@ -9,6 +9,10 @@ const client = redis.createClient(REDIS_PORT);
 
 const app = express();
 
+function setResponse(username, repos) {
+  return `<h1>${username} has ${repos} repos!</h1>`;
+}
+
 async function getRepos(req, res, next) {
   try {
     console.log("FETCHING DATA");
@@ -24,7 +28,7 @@ async function getRepos(req, res, next) {
     //set data to redis cache
     client.setex(username, 3600, repos);
 
-    res.send(data);
+    res.send(setResponse(username, repos));
   } catch (error) {
     console.log(error);
     res.status(500);
