@@ -35,6 +35,21 @@ async function getRepos(req, res, next) {
   }
 }
 
-app.get("/repos/:username", getRepos);
+//cache middleware
+function cache(req, res, next) {
+  const { username } = req.params;
+
+  client.get(username, (error, data) => {
+    if (error) throw error;
+
+    if (data !== null) {
+      res.send(setResponse(username, data));
+    } else {
+      next();
+    }
+  });
+}
+
+app.get("/repos/:username", cache, getRepos);
 
 app.listen(PORT, () => console.log(`listening on port ${PORT}`));
